@@ -1,0 +1,18 @@
+{
+  "headers": [
+    {
+      "source": "/rufrhkrhksflwkvpdlwl/(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    },
+    {
+      "source": "/rufrhkrhksflwkvpdlwl",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    }
+  ]
+}
