@@ -13,13 +13,16 @@
 | `api/submit.js` | 응답 저장 |
 | `api/admin.js` | 비밀번호 확인 후 응답 목록·CTA 클릭 수 반환 |
 | `api/track.js` | 결과 화면 '크리에이터 지원하기' 클릭 수 집계 (결과 유형별) |
+| `api/_store.js` | 저장소 자동 감지 (Neon/Postgres 우선, 없으면 Redis). 테이블 자동 생성 |
 | `api/_redis.js` | Redis 호출 헬퍼 (함수로 배포되지 않음) |
+| `package.json` | 서버 부품(pg, redis) — Vercel이 배포 시 자동 설치 |
 | `api/_scoring.js` | **비공개 점수표·결과 판정** (서버 전용, 브라우저로 전달되지 않음) |
 
 ## Vercel 배포 순서
 1. 이 폴더를 GitHub 레포로 올린 뒤 Vercel에서 Import (Framework: Other, 빌드 설정 없음)
-2. Vercel 프로젝트 → Storage → Marketplace에서 **Upstash for Redis** 연결
-   - 연결 시 `KV_REST_API_URL`, `KV_REST_API_TOKEN` 환경변수가 자동 추가됨 (`UPSTASH_REDIS_REST_URL/TOKEN`도 지원)
+2. Vercel 프로젝트 → Storage에서 **Neon**(현재 사용) 또는 Upstash Redis 연결
+   - Neon: `DATABASE_URL` 자동 추가 → 첫 요청 때 테이블(sense_responses, sense_cta, sense_fail) 자동 생성
+   - Redis: `KV_REST_API_URL/TOKEN` 또는 `REDIS_URL`
 3. Settings → Environment Variables에 `ADMIN_PASSWORD` 추가 (관리자 비밀번호)
 4. Redeploy
 

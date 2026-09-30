@@ -1,4 +1,4 @@
-const { redis, KEY } = require("./_redis");
+const store = require("./_store");
 const { SCORES, score } = require("./_scoring");
 
 const clip = (v, n) => String(v ?? "").slice(0, n);
@@ -20,10 +20,10 @@ module.exports = async (req, res) => {
     const r = score(answers);
 
     try {
-      await redis("LPUSH", KEY, JSON.stringify({
+      await store.addResponse({
         at: new Date().toISOString(), name, gender, birth,
         result: r.result, answers, score: r.score, ref: clip(b.ref, 200),
-      }));
+      });
     } catch (e) {
       console.error("저장 실패:", e.message); // 저장이 실패해도 참여자에게는 결과 표시
     }
