@@ -17,7 +17,7 @@ window.TEST_DATA = {
     // ← 구글폼 링크 입력 (예: "https://forms.gle/xxxx"). 비어 있으면 버튼 비활성.
     // 구글폼 '미리 채워진 링크'를 쓰면 {name} {result} 자리에 참여자 이름·결과 유형이 자동 입력됨
     //   예: "https://docs.google.com/forms/d/e/.../viewform?usp=pp_url&entry.111={name}&entry.222={result}"
-    url: "",
+    url: "https://docs.google.com/forms/d/e/1FAIpQLSdWAAA6Inf4hF-AqLFzoO5FZcjhB3m_suvkrTk_YSnL6MNRZQ/viewform",
   },
 
   // 개인정보 수집·이용 동의 문구 (보유기간은 운영 방침에 맞게 수정)
