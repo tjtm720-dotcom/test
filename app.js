@@ -13,9 +13,27 @@
   }
 
   // ---------- 인트로 ----------
-  $("t-title").textContent = D.title;
-  $("t-subtitle").classList.add("lines");
-  $("t-subtitle").innerHTML = D.subtitleLines.map(esc).join("<br>");
+  // 제목: "발달한 감각" 부분 강조
+  $("t-title").innerHTML = esc(D.title).replace("가장 ", "가장<br>").replace("발달한 감각", "<em>발달한 감각</em>");
+
+  // 결과 유형 미리보기
+  $("t-types").innerHTML = `<p>당신은 어떤 감각일까요?</p><div>` +
+    Object.entries(D.results).map(([k, r]) => `<span class="t-${k}">${esc(r.name)}</span>`).join("") + `</div>`;
+
+  // 부제 4줄을 한 줄씩 순환 표시
+  const tickColors = ["var(--c-money)", "var(--c-people)", "var(--c-trend)", "var(--c-creative)"];
+  const tk = $("t-ticker");
+  tk.innerHTML = D.subtitleLines.map((l, i) => `<span style="--tc:${tickColors[i % tickColors.length]}">${esc(l)}</span>`).join("");
+  const spans = tk.querySelectorAll("span");
+  let ti = 0;
+  spans[0].classList.add("on");
+  setInterval(() => {
+    const prev = spans[ti];
+    prev.classList.remove("on"); prev.classList.add("out");
+    setTimeout(() => prev.classList.remove("out"), 500);
+    ti = (ti + 1) % spans.length;
+    spans[ti].classList.add("on");
+  }, 1800);
   $("btn-start").textContent = D.startButton;
   $("p-items").textContent = D.privacy.items;
   $("p-purpose").textContent = D.privacy.purpose;
@@ -75,24 +93,31 @@
   };
 
   // ---------- 질문 ----------
-  function renderQuestion() {
+  const KEYS = ["A", "B", "C", "D", "E", "F"];
+  function renderQuestion(dir) {
     const total = D.questions.length;
     const q = D.questions[state.q];
-    $("q-bar").style.width = (state.q / total) * 100 + "%";
-    $("q-count").textContent = `${state.q + 1} / ${total}`;
+    $("q-dots").innerHTML = D.questions.map((_, i) => `<i class="${i < state.q ? "done" : i === state.q ? "now" : ""}"></i>`).join("");
+    $("q-count").textContent = `${state.q + 1}/${total}`;
+    $("q-no").textContent = "Q" + (state.q + 1);
     $("q-text").textContent = q.text;
-    $("btn-back").style.visibility = state.q === 0 ? "hidden" : "visible";
+    $("q-error").textContent = "";
+    $("btn-back").disabled = state.q === 0;
     const box = $("q-options");
     box.innerHTML = "";
-    state.order[state.q].forEach((i) => {
+    state.order[state.q].forEach((i, pos) => {
       const o = q.options[i];
       const b = document.createElement("button");
       b.type = "button";
-      b.textContent = o.text;
+      b.innerHTML = `<span class="k">${KEYS[pos]}</span><span>${esc(o.text)}</span>`;
       if (state.answers[state.q] === i) b.classList.add("picked");
       b.onclick = () => pick(i, b);
       box.appendChild(b);
     });
+    const body = $("q-body");
+    body.classList.remove("enter", "enter-back");
+    void body.offsetWidth;
+    body.classList.add(dir === "back" ? "enter-back" : "enter");
   }
 
   let locked = false;
@@ -107,20 +132,23 @@
         state.q++;
         renderQuestion();
       } else {
-        $("q-bar").style.width = "100%";
         finish();
       }
-    }, 220);
+    }, 260);
   }
 
   $("btn-back").onclick = () => {
-    if (state.q > 0) { state.q--; renderQuestion(); }
+    if (state.q > 0) { state.q--; renderQuestion("back"); }
   };
 
   // ---------- 결과 요청 (점수 계산은 서버에서만) ----------
   async function finish() {
     show("s-loading");
-    const wait = new Promise((r) => setTimeout(r, 1400));
+    const msgs = ["감각을 측정하고 있어요", "응답 패턴을 분석하고 있어요", "당신의 감각을 찾았어요"];
+    let mi = 0;
+    $("load-text").textContent = msgs[0];
+    const lt = setInterval(() => { mi = Math.min(mi + 1, msgs.length - 1); $("load-text").textContent = msgs[mi]; }, 800);
+    const wait = new Promise((r) => setTimeout(() => { clearInterval(lt); r(); }, 2400));
     try {
       const res = await fetch("/api/submit", {
         method: "POST",
@@ -137,13 +165,14 @@
     } catch (e) {
       await wait;
       show("s-quiz");
-      $("q-count").textContent = "결과를 불러오지 못했어요. 마지막 선택지를 다시 눌러 주세요.";
+      $("q-error").textContent = "결과를 불러오지 못했어요. 마지막 선택지를 다시 눌러 주세요.";
     }
   }
 
   function renderResult(key) {
     const res = D.results[key];
     state.result = key;
+    $("s-result").dataset.type = key;
     const [y, m, d] = state.birth.split("-");
     $("r-profile").textContent = `${state.name} · ${state.gender} · ${+y}년 ${+m}월 ${+d}일생`;
     $("r-name").textContent = res.name;
@@ -151,7 +180,7 @@
     $("r-keywords").innerHTML = (res.keywords || []).map((k) => `<span>#${esc(k)}</span>`).join("");
     $("r-desc").innerHTML = esc(res.description).replace(/\n/g, "<br>");
     $("r-sections").innerHTML = (res.sections || []).map((sec) =>
-      `<div class="card"><h3>${esc(sec.title)}</h3><ul>${sec.items.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>`
+      `<div class="panel"><h3>${esc(sec.title)}</h3><ul>${sec.items.map((i) => `<li>${esc(i)}</li>`).join("")}</ul></div>`
     ).join("");
     $("r-strength").innerHTML = res.strength ? `<b>당신의 강점</b>${esc(res.strength)}` : "";
     $("r-cta-text").textContent = res.ctaText || "";

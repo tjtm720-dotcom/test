@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0b1a">
 <title>나에게 가장 발달한 감각은?</title>
 <meta name="description" content="돈을 보는 감각? 사람을 읽는 감각? 유행을 발견하는 감각? 콘텐츠를 만드는 감각?">
 <meta property="og:title" content="나에게 가장 발달한 감각은?">
@@ -10,26 +11,37 @@
 <meta property="og:type" content="website">
 <!-- <meta property="og:image" content="https://도메인/og.png"> 공유 썸네일 이미지 준비 시 추가 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Outfit:wght@500;700;800&display=swap">
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="test">
+<div class="sky" aria-hidden="true"><i></i><i></i><i></i></div>
 <main class="wrap">
 
   <!-- 1. 인트로 -->
   <section id="s-intro" class="screen active">
-    <div class="hero">
-      <p class="eyebrow">감각 심리테스트</p>
-      <h1 id="t-title"></h1>
-      <p class="sub" id="t-subtitle"></p>
+    <div class="badge">SENSE TEST<span>8문항 · 약 1분</span></div>
+
+    <div class="orbit" aria-hidden="true">
+      <div class="core"></div>
+      <div class="ring r1"><b class="o money"></b><b class="o people"></b></div>
+      <div class="ring r2"><b class="o trend"></b><b class="o creative"></b></div>
+      <div class="ring r3"><b class="o opportunity"></b></div>
     </div>
-    <button class="btn primary" id="btn-start"></button>
+
+    <h1 class="title" id="t-title"></h1>
+    <div class="ticker" id="t-ticker" aria-live="polite"></div>
+
+    <button class="btn glow" id="btn-start"></button>
+    <div class="types" id="t-types"></div>
   </section>
 
   <!-- 2. 기본 정보 입력 -->
   <section id="s-info" class="screen">
-    <h2>기본 정보를 알려주세요</h2>
-    <form id="info-form" novalidate>
+    <p class="step">STEP 1</p>
+    <h2>시작하기 전에<br>당신을 알려주세요</h2>
+    <form id="info-form" class="panel" novalidate>
       <label class="field">
         <span>이름</span>
         <input id="f-name" type="text" maxlength="20" autocomplete="name" placeholder="이름 또는 닉네임">
@@ -70,42 +82,58 @@
       </div>
 
       <p class="error" id="f-error" role="alert"></p>
-      <button class="btn primary" type="submit">다음</button>
+      <button class="btn glow" type="submit">테스트 시작</button>
     </form>
   </section>
 
   <!-- 3. 질문 -->
   <section id="s-quiz" class="screen">
-    <div class="progress"><div class="bar" id="q-bar"></div></div>
-    <p class="count" id="q-count"></p>
-    <h2 class="question" id="q-text"></h2>
-    <div class="options" id="q-options"></div>
-    <button class="link" id="btn-back" type="button">이전 질문</button>
+    <div class="q-top">
+      <button class="back" id="btn-back" type="button" aria-label="이전 질문">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="dots" id="q-dots"></div>
+      <span class="count" id="q-count"></span>
+    </div>
+    <div class="q-body" id="q-body">
+      <p class="q-no" id="q-no"></p>
+      <h2 class="question" id="q-text"></h2>
+      <div class="options" id="q-options"></div>
+    </div>
+    <p class="error center" id="q-error" role="alert"></p>
   </section>
 
   <!-- 4. 분석 중 -->
   <section id="s-loading" class="screen">
-    <div class="spinner" aria-hidden="true"></div>
-    <p class="sub">결과를 분석하고 있어요</p>
+    <div class="scan" aria-hidden="true">
+      <b class="o money"></b><b class="o trend"></b><b class="o people"></b><b class="o creative"></b><b class="o opportunity"></b>
+      <div class="pulse"></div>
+    </div>
+    <p class="load-text" id="load-text">감각을 측정하고 있어요</p>
   </section>
 
   <!-- 5. 결과 -->
   <section id="s-result" class="screen">
-    <div class="profile" id="r-profile"></div>
-    <p class="eyebrow">당신에게 가장 발달한 감각은</p>
-    <h1 class="result-name" id="r-name"></h1>
-    <p class="result-tagline" id="r-tagline"></p>
-    <div class="chips" id="r-keywords"></div>
-    <div class="card result-desc" id="r-desc"></div>
+    <div class="hero-card">
+      <p class="profile" id="r-profile"></p>
+      <p class="r-label">당신에게 가장 발달한 감각은</p>
+      <h1 class="r-name" id="r-name"></h1>
+      <p class="r-tagline" id="r-tagline"></p>
+      <div class="chips" id="r-keywords"></div>
+    </div>
+
+    <div class="panel r-desc" id="r-desc"></div>
     <div id="r-sections"></div>
-    <div class="card strength" id="r-strength"></div>
+    <div class="panel strength" id="r-strength"></div>
+
     <div class="cta-box">
       <p id="r-cta-text"></p>
-      <a class="btn primary" id="btn-cta" target="_blank" rel="noopener"></a>
+      <a class="btn type" id="btn-cta" target="_blank" rel="noopener"></a>
     </div>
     <p class="note" id="r-note"></p>
+
     <div class="actions">
-      <button class="btn" id="btn-share" type="button">결과 공유하기</button>
+      <button class="btn line" id="btn-share" type="button">결과 공유하기</button>
       <button class="btn ghost" id="btn-retry" type="button">다시 하기</button>
     </div>
     <p class="toast" id="toast"></p>
